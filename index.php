@@ -1,5 +1,3 @@
-
-
 <?php get_header() ; ?>
 <?php
 // test si on a des articles à afficher
@@ -21,5 +19,4 @@ else : ?>
 <p>Désolé pour l'instant il n'y a pas d'article </p>
 <?php endif ; ?>
 </div>
-
 <?php get_footer() ; ?>
