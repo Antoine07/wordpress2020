@@ -39,14 +39,14 @@ echo sprintf(
 
 $page = get_page_by_title('Qui sommes-nous ?') ;
 
-var_dump($page);
+// var_dump($page);
 echo sprintf(
     '<li class="nav-item">
         <a href="%s" alt="Home" >
             %s
         </a>
     </li>',
-    get_permalink($age->ID),
+    get_permalink($page->ID),
     'Qui sommes-nous ?'
 );
 echo '</ul>';
