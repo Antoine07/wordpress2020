@@ -37,4 +37,16 @@ echo sprintf(
     "Page d'accueil"
 );
 
+$page = get_page_by_title('Qui sommes-nous ?') ;
+
+var_dump($page);
+echo sprintf(
+    '<li class="nav-item">
+        <a href="%s" alt="Home" >
+            %s
+        </a>
+    </li>',
+    get_permalink($age->ID),
+    'Qui sommes-nous ?'
+);
 echo '</ul>';
