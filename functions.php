@@ -8,10 +8,7 @@ register_nav_menus([
     'footer'    => 'Menu dans le footer',
 ]);
 
-
 // Style et JS
-
-
 // add_action('wp_enqueue_scripts', function(){
 
 // });
@@ -44,4 +41,106 @@ function al_read_more($more)
 //    var_dump($post);  // objet dans la boucle de WP
 
     return '<p><a href="' . get_permalink($post->ID) . '" >lire la suite</a></p>';
+}
+
+// agit sur l'extrait uniquement
+// attention la fonction de callback récupère l'extrait
+// il faut penser à le retourner
+add_filter('the_excerpt', function($excerpt){
+
+    $copyRight = "Copyright";
+
+    return sprintf("%s <p>%s</p>", $excerpt, $copyRight) ;
+});
+
+
+// fonction de callback appelée par le hook
+function al_add_svg( $excerpt ) {
+    
+    // on teste si on est dans la catégorie love
+    if(is_category('love'))
+
+        return $excerpt. '<svg xmlns="http://www.w3.org/2000/svg" 
+        width="100%" 
+        height="100" 
+        viewBox="0 0 100 100" 
+        preserveAspectRatio="none"><path d="M0 0 L50 25 L100 0 Z" />';
+
+    // ailleurs
+    return $excerpt;
+}
+
+/**
+ * Custom post type event
+ */
+
+add_action('init', 'al_create_post_type' );
+
+function al_create_post_type() {
+
+  // définit le custom (post_type dans la table wp_posts MySQL)
+  register_post_type( 'event',
+   [
+       // les labels permettent d'afficher des informations dans le CMS
+      'labels' => [
+        'name' => 'Événement',
+        'singular_name' => 'Événement'
+        ],
+
+      'public' => true, // pour qu'il s'affiche dans l'administration
+      // le support permet de définir les attributs du contenu 
+      // ici nous il aura un titre, un éditeur et des images en avant
+      'supports' => [
+        'title',
+        'editor',
+        'thumbnail'
+      ],
+      'has_archive' => true // visible dans les archives
+   ]
+  );
+}
+
+// afficher les customs posts types en page d'accueil
+
+add_filter( 'pre_get_posts', 'al_get_posts' );
+
+function al_get_posts( $query ) {
+
+// attention $query est globale donc pour éviter les effets de bord
+// on précise que la query est bien la query principale : query de la boucle elle-même
+ if ( is_home() && $query->is_main_query() )
+    $query->set( 'post_type', [ 'event', 'post' ] );
+
+ return $query;
+}
+
+// Affichage des derniers events dans la sidebar
+
+// afficher les derniers événements
+// création d'un hook
+add_action('al_sidebar', 'al_get_events_list', 10, 1 );
+
+function al_get_events_list(int $number){
+    $args = [
+        'post_type' => 'event',
+        'posts_per_page' => $number
+    ];
+
+    $query = new WP_Query( $args );
+
+    if ( $query->have_posts() ) : ?>
+    <ul class="list-group">
+        <a href="#" class="list-group-item active">
+            Liste des/du dernier(s) événement(s)
+        </a>
+	<?php while ( $query->have_posts() ) : $query->the_post(); ?>
+		<li class="list-group-item" ><a href="<?php the_permalink(); ?>"><?php the_title(); ?></a></li>
+	<?php endwhile; ?>
+    </ul>
+	<?php wp_reset_postdata(); // permet de réinitialiser la variable $post ?>
+
+<?php else : ?>
+	<p>Désolé pas d'évent en ce moment</p>
+<?php endif; 
+
 }
