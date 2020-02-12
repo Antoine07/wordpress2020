@@ -7,6 +7,7 @@
    <title>Book</title>
    <?php wp_head() ; ?>
 </head>
+<!-- body_class injecte des classes automatiquement en fonction de la page qu'il affiche -->
 <body <?php body_class(); ?> >
 <?php wp_nav_menu([
             'theme_location'  => 'main',

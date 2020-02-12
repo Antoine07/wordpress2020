@@ -16,6 +16,8 @@ register_nav_menus([
 
 // });
 
+// Hook permettant de charger les styles et script JS
+// le Hook s'appelle wp_enqueue_scripts et la fonction al_setup_script est une fonction de callback
 add_action('wp_enqueue_scripts', 'al_setup_script');
 
 function al_setup_script()
@@ -30,4 +32,16 @@ function al_setup_script()
     if (is_category('Data')) {
         wp_enqueue_style('book-data', get_template_directory_uri() . '/assets/css/data.css');
      }
+}
+
+// Hook excerpt_more
+add_filter('excerpt_more', 'al_read_more');
+
+function al_read_more($more)
+{
+    global $post; // le post dans la boucle objet
+
+//    var_dump($post);  // objet dans la boucle de WP
+
+    return '<p><a href="' . get_permalink($post->ID) . '" >lire la suite</a></p>';
 }
