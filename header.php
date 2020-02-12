@@ -7,7 +7,7 @@
    <title>Book</title>
    <?php wp_head() ; ?>
 </head>
-<body>
+<body class="body-content">
 <?php wp_nav_menu([
             'theme_location'  => 'main',
             'container'       => 'nav', // wrapper nav
