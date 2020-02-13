@@ -144,3 +144,73 @@ function al_get_events_list(int $number){
 <?php endif; 
 
 }
+
+// Shortcode
+
+/**
+ * al_shortocde_event
+ *
+ * @param [type] $atts
+ * @param [type] $content null permet éventuellement d'utiliser le content dans le code
+ * @return void
+ */
+function al_shortocde_event( $atts, $content = null ) {
+
+    $defaults = shortcode_atts( [
+		'before' => date('Y') + 10, // on avance + 10 ans par défaut pour être sûr de les afficher tous par défaut 
+		'after' => date('Y') - 10, // on recule de 10 ans pour être sûr de les afficher tous par défaut
+		'limit' => -1, // tous les articles,
+		'title' => 'Evénement(s)'
+	], $atts );
+	
+	$args = [
+		'post_type' => 'event',
+		'post_status'=> ['future', 'publish'],
+		'posts_per_page' => $defaults['limit'],
+		'date_query' => [
+			[
+				'after'     => [
+					'year' => $defaults['after']
+					],
+				'before'    => [
+					'year' => $defaults['before']
+					]
+				],
+			],
+	];
+	
+	if(isset($atts['term'])){
+		$terms = [
+			'tax_query' => [
+				[
+					'taxonomy' => 'country',
+					'field'    => 'slug',
+					'terms'    => $atts['term'],
+				],
+			]
+		];
+
+		$args = array_merge($args, $terms);
+		
+	}
+
+	$query = new WP_Query( $args );
+
+	$date = '';
+	if(isset($atts['after'])) $date = "Après : {$atts['after']}";
+	if(isset($atts['before'])) $date = " Avant : {$atts['before']}";
+
+	if ( $query->have_posts() ) : ?>
+	<ul class="menu">
+	<h2><?php echo $defaults['title']; ?> <?php echo $date; ?></h2>
+	<?php while ( $query->have_posts() ) : $query->the_post(); ?>
+		<li><a href="<?php the_permalink(); ?>"><?php the_title(); ?></a>
+		date de publication : <?php the_time('F Y'); ?></li>
+	<?php endwhile; ?>
+	</ul>
+
+	<?php wp_reset_postdata(); // évite les effets de bord avec la global $posts
+	endif;
+}
+
+add_shortcode( 'event_book', 'al_shortocde_event' );
